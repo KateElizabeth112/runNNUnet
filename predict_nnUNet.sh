@@ -18,3 +18,6 @@ OUTPUT_DIR=$ROOT_DIR"inference"
 
 # make predictions
 nnUNet_predict -i $INPUT_DIR -o $OUTPUT_DIR -t $TASK -m 2d -chk model_best
+
+# check predictions and make plots
+python3 checkPredictions.py -r $ROOT_DIR -t $TASK
