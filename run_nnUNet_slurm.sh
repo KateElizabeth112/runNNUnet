@@ -27,7 +27,7 @@ echo $RESULTS_FOLDER
 #python3 generateDatasetJson.py -r $ROOT_DIR -n $DS -t $TASK
 
 # Plan and preprocess data
-nnUNet_plan_and_preprocess -t 800 --verify_dataset_integrity
+#nnUNet_plan_and_preprocess -t 800 --verify_dataset_integrity
 
 # Train
 nnUNet_train 2d nnUNetTrainerV2 Task800 0 --npz
