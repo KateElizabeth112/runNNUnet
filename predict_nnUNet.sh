@@ -13,7 +13,7 @@ ROOT_DIR='/vol/biomedic3/kc2322/data/MSDPancreas_nnUNet/'
 TASK='Task800'
 DS='MSDPancreas'
 
-INPUT_DIR=$ROOT_DIR"nnUNet_raw_data_base/nnUNet_raw_data/Task500_BTCV/imagesTs"
+INPUT_DIR=$ROOT_DIR"nnUNet_raw_data_base/nnUNet_raw_data/"$TASK"/imagesTs"
 OUTPUT_DIR=$ROOT_DIR"inference"
 
 # make predictions
