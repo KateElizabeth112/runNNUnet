@@ -62,20 +62,20 @@ def main():
     files = os.listdir(img_path)
     for f in files:
         # try to load the file and the label so we can visualise them
+        if f.endswith(".nii.gz"):
+            # extract the file name so we can also open the label file
+            id = f.split('_')[1]
+            label_name = "pancreas_" + id + ".nii.gz"
+            print(label_name, f)
 
-        # extract the file name so we can also open the label file
-        id = f.split('_')[1]
-        label_name = "pancreas_" + id + ".nii.gz"
-        print(label_name, f)
+            img_nii = nib.load(os.path.join(img_path, f))
+            lab_nii = nib.load(os.path.join(label_path, label_name))
+            pred_nii = nib.load(os.path.join(pred_path, label_name))
 
-        img_nii = nib.load(os.path.join(img_path, f))
-        lab_nii = nib.load(os.path.join(label_path, label_name))
-        pred_nii = nib.load(os.path.join(pred_path, label_name))
-
-        # Visualise
-        PlotSliceAndPrediction(np.rot90(img_nii.get_fdata()[:, :, 0]), np.rot90(lab_nii.get_fdata()[:, :, 0]),
-                               np.rot90(pred_nii.get_fdata()[:, :, 0]),
-                               save_path=os.path.join(output_dir, "pancreas_" + id + ".png"))
+            # Visualise
+            PlotSliceAndPrediction(np.rot90(img_nii.get_fdata()[:, :, 0]), np.rot90(lab_nii.get_fdata()[:, :, 0]),
+                                   np.rot90(pred_nii.get_fdata()[:, :, 0]),
+                                   save_path=os.path.join(output_dir, "pancreas_" + id + ".png"))
 
 
 if __name__ == "__main__":
