@@ -3,6 +3,7 @@ import os
 import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle as pkl
 
 # argparse
 parser = argparse.ArgumentParser(description="Just an example",
@@ -15,6 +16,7 @@ args = vars(parser.parse_args())
 # set up variables
 ROOT_DIR = args['root_dir']
 TASK_ID = args['task_id']
+NUM_CHANNELS = 2
 
 # Check the predictions made by nnUNet - make plots and calculate Dice score
 img_path = os.path.join(ROOT_DIR, "nnUNet_raw_data_base/nnUNet_raw_data/{}/imagesTs".format(TASK_ID))
@@ -57,9 +59,17 @@ def PlotSliceAndPrediction(image_slice, labels_slice, preds_slice, save_path="")
     else:
         plt.savefig(save_path)
 
+    return dice
+
 
 def main():
     files = os.listdir(img_path)
+    ds_length = len(files)
+    # create an empty array to store results
+    dice_all = np.zeros((NUM_CHANNELS, ds_length))
+    nsd_all = np.zeros((NUM_CHANNELS, ds_length))
+
+    j = 0
     for f in files:
         # try to load the file and the label so we can visualise them
         if f.endswith(".nii.gz"):
@@ -68,14 +78,24 @@ def main():
             label_name = "pancreas_" + id + ".nii.gz"
             print(label_name, f)
 
-            img_nii = nib.load(os.path.join(img_path, f))
-            lab_nii = nib.load(os.path.join(label_path, label_name))
-            pred_nii = nib.load(os.path.join(pred_path, label_name))
+            img = nib.load(os.path.join(img_path, f)).get_fdata()
+            lab = nib.load(os.path.join(label_path, label_name)).get_fdata()
+            pred = nib.load(os.path.join(pred_path, label_name)).get_fdata()
+
 
             # Visualise
-            PlotSliceAndPrediction(np.rot90(img_nii.get_fdata()[:, :, 0]), np.rot90(lab_nii.get_fdata()[:, :, 0]),
-                                   np.rot90(pred_nii.get_fdata()[:, :, 0]),
-                                   save_path=os.path.join(output_dir, "pancreas_" + id + ".png"))
+            dice = PlotSliceAndPrediction(np.rot90(img[:, :, 0]), np.rot90(lab[:, :, 0]),
+                                          np.rot90(pred[:, :, 0]),
+                                          save_path=os.path.join(output_dir, "pancreas_" + id + ".png"))
+
+            dice_all[1, j] = dice
+
+            j += 1
+
+    # Save results
+    f = open(os.path.join(output_dir, "results.pkl"), 'wb')
+    pkl.dump([dice_all, nsd_all], f)
+    f.close()
 
 
 if __name__ == "__main__":
